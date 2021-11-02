@@ -45,6 +45,32 @@ def input_parse():
     return inputs
 
 
+def get_generator_information(net):
+    """
+    Get DataFrame summarizing all the generator information
+
+    Parameters
+    ----------
+    net: pandapowerNet
+        Network to summarize
+
+    Returns
+    -------
+    df_gen_info: DataFrame
+        Summary of generator information in `net`
+    """
+    # Initialize local vars
+    gen_types = ['gen', 'sgen', 'ext_grid']
+    df_gen_info = pd.DataFrame()
+
+    # Convert generator information dataframe
+    for gen_type in gen_types:
+        df_gen_info = df_gen_info.append(getattr(net, gen_type))
+    df_gen_info = df_gen_info.reset_index(drop=True)  # Important to eliminate duplicated indices
+
+    return df_gen_info
+
+
 def grid_sample(df_gridspecs):
     """
     Pandas-based grid sampling function
