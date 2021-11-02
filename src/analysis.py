@@ -65,7 +65,9 @@ def get_generator_information(net):
 
     # Convert generator information dataframe
     for gen_type in gen_types:
-        df_gen_info = df_gen_info.append(getattr(net, gen_type))
+        df_temp_gen_info = getattr(net, gen_type)
+        df_temp_gen_info['et'] = gen_type
+        df_gen_info = df_gen_info.append(df_temp_gen_info)
     df_gen_info = df_gen_info.reset_index(drop=True)  # Important to eliminate duplicated indices
 
     return df_gen_info
