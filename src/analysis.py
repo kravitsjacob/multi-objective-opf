@@ -3,6 +3,10 @@
 import os
 import configparser
 import argparse
+import itertools
+
+import numpy as np
+import pandas as pd
 
 
 def input_parse():
@@ -40,3 +44,28 @@ def input_parse():
 
     return inputs
 
+
+def grid_sample(df_gridspecs):
+    """
+    Pandas-based grid sampling function
+
+    Parameters
+    ----------
+    df_gridspecs: DataFrame
+        Grid specifications, must have columns of ['var', 'min', 'max', 'steps']. These reflect the variable names,
+        minimum value of grid sampling, maximum value of grid sampling, and number of steps respectively.
+
+    Returns
+    -------
+    df_grid: DataFrame
+        Dataframe of grid sampling. Will have columns of names specified in 'var' list
+    """
+    # Get linear spaces
+    linspace_list = []
+    for i, row in df_gridspecs.iterrows():
+        linspace_list.append(np.linspace(row['min'], row['max'], row['steps']))
+
+    # Create dataframe
+    df_grid = pd.DataFrame(list(itertools.product(*linspace_list)), columns=df_gridspecs['var'].tolist())
+
+    return df_grid
