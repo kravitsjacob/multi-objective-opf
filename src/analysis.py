@@ -35,7 +35,8 @@ def input_parse():
     path_to_data = config_inputs['MAIN IO']['data']
     inputs = {
         'path_to_data': path_to_data,
-        'path_to_pae': os.path.join(path_to_data, config_inputs['INPUT']['path_to_pae']),
+        'path_to_df_coef': os.path.join(path_to_data, config_inputs['INPUT']['path_to_df_coef']),
     }
 
     return inputs
+
