@@ -1,0 +1,8 @@
+name: multi-objective-opf
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pandapower
+prefix: C:\Users\kravi\.conda\envs\multi-objective-opf
