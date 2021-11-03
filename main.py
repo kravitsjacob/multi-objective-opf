@@ -2,7 +2,6 @@
 
 import pandapower.networks
 import pandas as pd
-import numpy as np
 
 from src import analysis
 
@@ -13,23 +12,19 @@ def main():
     inputs = analysis.input_parse()
     net = pandapower.networks.case_ieee30()
     df_abido_coef = pd.read_csv(inputs['path_to_df_abido_coef'])
+    df_macknick_coef = pd.read_csv(inputs['path_to_df_macknick_coef'])
 
     # Fuel and cooling system type
-    analysis.get_fuel_cool(df_abido_coef)
+    df_coef = analysis.get_fuel_cool(df_abido_coef)
 
     # Get emission coefficients
+    df_coef = analysis.get_emission_coef(df_coef)
 
     # Get water use coefficients
+    df_coef = analysis.get_water_use_rate(df_coef, df_macknick_coef)
 
-
-    # Get coefficients
-    df_temp = df_abido_coef.copy()
-    df_temp['p_mw'] = 50.0
-    df_objective_components = analysis.compute_objective_terms(df_temp, t=np.nan)
-    a = 1
-
-    net.df_coef = df_abido_coef
-
+    # Assign coefficients
+    net.df_coef = df_coef
 
     # Sample decision space
     df_gen_info = analysis.get_generator_information(net)
@@ -44,11 +39,12 @@ def main():
     )
     df_grid = analysis.grid_sample(df_gridspecs)
 
-    # solve opf
+    # Solve opf
     df_results = df_grid.apply(
         lambda row: analysis.mo_opf(row, net),
         axis=1
     )
+    df_results = pd.concat([df_grid, df_results], axis=1)
 
     return 0
 
