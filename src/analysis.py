@@ -145,7 +145,7 @@ def compute_objective_terms(df, t):
     df['F_with'] = df['beta_with'] * df['p_mw'] * t
 
     # Consumption
-    df['F_con'] = df['beta_with'] * df['p_mw'] * t
+    df['F_con'] = df['beta_con'] * df['p_mw'] * t
 
     return df
 
@@ -167,7 +167,7 @@ def mo_opf(ser_decisions, net):
         Series of objective values
     """
     # Local vars
-    t = 5 * 1 / 60 * 1000  # minutes * hr/minutes * kw/MW
+    t = 5 * 1 / 60  # minutes * hr/minutes
     net = copy.deepcopy(net)
 
     # Apply decision to network
@@ -309,6 +309,13 @@ def get_water_use_rate(df_coef, df_macknick_coef):
     df_coef: DataFrame
         Coefficients dataframe with withdrawal and consumption rates assigned (gal/MWh)
     """
-    a = 1
+    df_coef = pd.merge(
+        df_coef,
+        df_macknick_coef,
+        left_on=['fuel_type', 'cooling_type'],
+        right_on=['fuel_type', 'cooling_type']
+    )
+    df_coef['beta_with'] = df_coef['withdrawal_rate_(gal/MWh)']
+    df_coef['beta_con'] = df_coef['consumption_rate_(gal/MWh)']
 
     return df_coef
