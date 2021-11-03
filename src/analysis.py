@@ -52,6 +52,7 @@ def input_parse(path_to_config=None):
     inputs = {
         'path_to_data': path_to_data,
         'path_to_df_abido_coef': os.path.join(path_to_data, config_inputs['INPUT']['path_to_df_abido_coef']),
+        'path_to_df_macknick_coef': os.path.join(path_to_data, config_inputs['INPUT']['path_to_df_macknick_coef']),
     }
 
     return inputs
@@ -281,7 +282,7 @@ def get_emission_coef(df_coef):
     return df_coef
 
 
-def get_water_use_rate(df_coef):
+def get_water_use_rate(df_coef, df_macknick_coef):
     """
     Assign water consumption and withdrawal rates based on macknick_operational_2012
 
@@ -300,11 +301,14 @@ def get_water_use_rate(df_coef):
     df_coef: DataFrame
         Coefficients dataframe with fuel and cooling systems assigned
 
+    df_macknick_coef: DataFrame
+        Water use coefficients from Macknick (2012)
+
     Returns
     -------
     df_coef: DataFrame
         Coefficients dataframe with withdrawal and consumption rates assigned (gal/MWh)
     """
-
+    a = 1
 
     return df_coef
