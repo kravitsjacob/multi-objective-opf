@@ -214,3 +214,44 @@ def mo_opf(ser_decisions, net):
         )
 
     return ser_obj
+
+
+def get_fuel_cool(df_abido_coef):
+    """
+
+    Parameters
+    ----------
+    df_abido_coef: DataFrame
+        Cost and emission coefficients from Abido (2003) paper
+
+    Returns
+    -------
+    df_coef: DataFrame
+        Coefficients dataframe with fuel and cooling systems assigned
+
+    """
+    # Local vars
+    df_coef = df_abido_coef.copy()
+
+    # Compute objectives terms
+    df_abido_coef['p_mw'] = 50.0
+    df_objective_components = compute_objective_terms(df_abido_coef, t=np.nan)
+
+    # Minimum emissions gets assigned nuclear
+    nuc_idx = df_objective_components['F_emit'].idxmin()
+    df_coef.loc[nuc_idx, 'Fuel Type'] = 'Nuclear'
+    df_coef.loc[nuc_idx, 'Cooling Type'] = 'Once-through'
+
+    # Minimum cost gets assigned coal
+    coal_idx = df_objective_components['F_cos'].idxmin()
+    df_coef.loc[coal_idx, 'Fuel Type'] = 'Coal'
+    df_coef.loc[coal_idx, 'Cooling Type'] = 'Once-through'
+
+    # Remaining assigned natural gas
+    df_coef['Fuel Type'] = df_coef['Fuel Type'].fillna('Natural Gas')
+
+    # Natural gas get split to have some tower and some once-through cooling
+    df_coef['Cooling Type'] = df_coef['Cooling Type'].fillna('Tower', limit=2)
+    df_coef['Cooling Type'] = df_coef['Cooling Type'].fillna('Once-through')
+
+    return df_coef
