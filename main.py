@@ -50,7 +50,19 @@ def main():
         )
         df_grid_results = pd.concat([df_grid, df_grid_results], axis=1)
         df_grid_results = df_grid_results.dropna()
-        df_grid_results.to_csv(inputs['path_to_df_grid_results'])  # Save checkpoint
+
+        # Save checkpoint
+        df_grid_results.to_csv(inputs['path_to_df_grid_results'], index=False)
+
+    if not os.path.exists(inputs['path_to_df_nondom']):
+        # Load required checkpoints
+        df_grid_results = pd.read_csv(inputs['path_to_df_grid_results'])
+
+        # Nondominated filter
+        df_nondom = analysis.get_nondomintated(df_grid_results, objs=['F_cos', 'F_emit', 'F_with', 'F_con'])
+
+        # Save checkpoint
+        df_nondom.to_csv(inputs['path_to_df_nondom'], index=False)
 
     return 0
 
