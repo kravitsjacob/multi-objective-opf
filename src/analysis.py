@@ -54,7 +54,11 @@ def input_parse(path_to_config=None):
         'path_to_data': path_to_data,
         'path_to_df_abido_coef': os.path.join(path_to_data, config_inputs['INPUT']['path_to_df_abido_coef']),
         'path_to_df_macknick_coef': os.path.join(path_to_data, config_inputs['INPUT']['path_to_df_macknick_coef']),
-        'path_to_df_grid_results': os.path.join(path_to_data, config_inputs['GENERATED_FILES']['path_to_df_grid_results'])
+        'path_to_df_grid_results': os.path.join(
+            path_to_data,
+            config_inputs['GENERATED_FILES']['path_to_df_grid_results']
+        ),
+        'path_to_df_nondom': os.path.join(path_to_data, config_inputs['GENERATED_FILES']['path_to_df_nondom'])
     }
 
     return inputs
