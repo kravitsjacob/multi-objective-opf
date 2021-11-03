@@ -279,3 +279,32 @@ def get_emission_coef(df_coef):
     df_coef.loc[nuc_idx, emit_cols] = 0.0
 
     return df_coef
+
+
+def get_water_use_rate(df_coef):
+    """
+    Assign water consumption and withdrawal rates based on macknick_operational_2012
+
+    @article{macknick_operational_2012,
+        title = {Operational water consumption and withdrawal factors for electricity generating technologies: a review
+         of existing literature},
+        doi = {10.1088/1748-9326},
+        journal = {Environ. Res. Lett.},
+        author = {Macknick, J and Newmark, R and Heath, G and Hallett, K C},
+        year = {2012},
+        pages = {11},
+    }
+
+    Parameters
+    ----------
+    df_coef: DataFrame
+        Coefficients dataframe with fuel and cooling systems assigned
+
+    Returns
+    -------
+    df_coef: DataFrame
+        Coefficients dataframe with withdrawal and consumption rates assigned (gal/MWh)
+    """
+
+
+    return df_coef
