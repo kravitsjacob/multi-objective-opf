@@ -114,6 +114,21 @@ def grid_sample(df_gridspecs):
 
 
 def mo_opf(ser_decisions, net):
+    """
+    Multi-objective optimal power flow
+
+    Parameters
+    ----------
+    ser_decisions: Series
+        Decision variables in series, index is bus number, values are power in MW
+    net: pandapowerNet
+        Network to assess, df_coef attribute
+
+    Returns
+    -------
+    ser_obj: Series
+        Series of objective values
+    """
     # Local vars
     t = 5 * 1 / 60 * 1000  # minutes * hr/minutes * kw/MW
     net = copy.deepcopy(net)
@@ -121,38 +136,52 @@ def mo_opf(ser_decisions, net):
     # Apply decision to network
     ser_decisions.name = 'p_mw_decisions'
     net.gen = net.gen.merge(ser_decisions, left_on='bus', right_index=True)
+
     net.gen['p_mw'] = net.gen['p_mw_decisions']
 
-    # Solve powerflow
+    # Solve powerflow to solve for external generator
     pp.rundcpp(net)
 
-    # Formatting results
-    df_obj = get_generator_information(net, ['res_gen', 'res_ext_grid'])
-    df_obj = df_obj.merge(net.df_coef, left_on=['element', 'et'], right_on=['element', 'et'])
+    # Check if external generator is outside limits
+    ext_gen_in_limits = net.ext_grid['min_p_mw'][0] < net.res_ext_grid['p_mw'][0] < net.ext_grid['max_p_mw'][0]
 
-    # Compute objectives terms
-    df_obj['F_cos'] = df_obj['a'] + df_obj['b'] * (df_obj['p_mw']/100) + df_obj['c'] * (df_obj['p_mw']/100)**2
-    df_obj['F_emit'] = \
-        0.01 * df_obj['alpha'] +\
-        0.01 * df_obj['beta_emit'] * (df_obj['p_mw']/100) +\
-        0.01 * df_obj['gamma'] * (df_obj['p_mw']/100)**2 +\
-        df_obj['xi'] * np.exp(df_obj['lambda'] * (df_obj['p_mw']/100))
-    df_obj['F_with'] = df_obj['beta_with'] * df_obj['p_mw'] * t
-    df_obj['F_con'] = df_obj['beta_with'] * df_obj['p_mw'] * t
+    if ext_gen_in_limits:
+        # Formatting results
+        df_obj = get_generator_information(net, ['res_gen', 'res_ext_grid'])
+        df_obj = df_obj.merge(net.df_coef, left_on=['element', 'et'], right_on=['element', 'et'])
 
-    # Compute objectives
-    df_obj_sum = df_obj.sum()
-    f_cos = df_obj_sum['F_cos']
-    f_emit = df_obj_sum['F_emit']
-    f_with = df_obj_sum['F_with']
-    f_con = df_obj_sum['F_con']
-    ser_obj = pd.Series(
-        {
-            'F_cos': f_cos,
-            'F_emit': f_emit,
-            'F_with': f_with,
-            'F_con': f_con
-        }
-    )
+        # Compute objectives terms
+        df_obj['F_cos'] = df_obj['a'] + df_obj['b'] * (df_obj['p_mw']/100) + df_obj['c'] * (df_obj['p_mw']/100)**2
+        df_obj['F_emit'] = \
+            0.01 * df_obj['alpha'] +\
+            0.01 * df_obj['beta_emit'] * (df_obj['p_mw']/100) +\
+            0.01 * df_obj['gamma'] * (df_obj['p_mw']/100)**2 +\
+            df_obj['xi'] * np.exp(df_obj['lambda'] * (df_obj['p_mw']/100))
+        df_obj['F_with'] = df_obj['beta_with'] * df_obj['p_mw'] * t
+        df_obj['F_con'] = df_obj['beta_with'] * df_obj['p_mw'] * t
+
+        # Compute objectives
+        df_obj_sum = df_obj.sum()
+        f_cos = df_obj_sum['F_cos']
+        f_emit = df_obj_sum['F_emit']
+        f_with = df_obj_sum['F_with']
+        f_con = df_obj_sum['F_con']
+        ser_obj = pd.Series(
+            {
+                'F_cos': f_cos,
+                'F_emit': f_emit,
+                'F_with': f_with,
+                'F_con': f_con
+            }
+        )
+    else:
+        ser_obj = pd.Series(
+            {
+                'F_cos': np.nan,
+                'F_emit': np.nan,
+                'F_with': np.nan,
+                'F_con': np.nan
+            }
+        )
 
     return ser_obj
