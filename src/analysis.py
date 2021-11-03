@@ -239,19 +239,26 @@ def get_fuel_cool(df_abido_coef):
 
     # Minimum emissions gets assigned nuclear
     nuc_idx = df_objective_components['F_emit'].idxmin()
-    df_coef.loc[nuc_idx, 'Fuel Type'] = 'Nuclear'
-    df_coef.loc[nuc_idx, 'Cooling Type'] = 'Once-through'
+    df_coef.loc[nuc_idx, 'fuel_type'] = 'Nuclear'
+    df_coef.loc[nuc_idx, 'cooling_type'] = 'Once-through'
 
     # Minimum cost gets assigned coal
     coal_idx = df_objective_components['F_cos'].idxmin()
-    df_coef.loc[coal_idx, 'Fuel Type'] = 'Coal'
-    df_coef.loc[coal_idx, 'Cooling Type'] = 'Once-through'
+    df_coef.loc[coal_idx, 'fuel_type'] = 'Coal'
+    df_coef.loc[coal_idx, 'cooling_type'] = 'Once-through'
 
     # Remaining assigned natural gas
-    df_coef['Fuel Type'] = df_coef['Fuel Type'].fillna('Natural Gas')
+    df_coef['fuel_type'] = df_coef['fuel_type'].fillna('Natural Gas')
 
     # Natural gas get split to have some tower and some once-through cooling
-    df_coef['Cooling Type'] = df_coef['Cooling Type'].fillna('Tower', limit=2)
-    df_coef['Cooling Type'] = df_coef['Cooling Type'].fillna('Once-through')
+    df_coef['cooling_type'] = df_coef['cooling_type'].fillna('Tower', limit=2)
+    df_coef['cooling_type'] = df_coef['cooling_type'].fillna('Once-through')
+
+    return df_coef
+
+
+def get_emission_coef(df_coef):
+    a = 1
+    # Nuclear has no pollution
 
     return df_coef
