@@ -1,5 +1,7 @@
 """Conduct analysis python script"""
 
+import os
+
 import pandapower.networks
 import pandas as pd
 
@@ -10,41 +12,45 @@ def main():
     # Inputs
     n_steps = 2
     inputs = analysis.input_parse()
-    net = pandapower.networks.case_ieee30()
-    df_abido_coef = pd.read_csv(inputs['path_to_df_abido_coef'])
-    df_macknick_coef = pd.read_csv(inputs['path_to_df_macknick_coef'])
 
-    # Fuel and cooling system type
-    df_coef = analysis.get_fuel_cool(df_abido_coef)
+    if not os.path.exists(inputs['path_to_df_grid_results']):
+        net = pandapower.networks.case_ieee30()
+        df_abido_coef = pd.read_csv(inputs['path_to_df_abido_coef'])
+        df_macknick_coef = pd.read_csv(inputs['path_to_df_macknick_coef'])
 
-    # Get emission coefficients
-    df_coef = analysis.get_emission_coef(df_coef)
+        # Fuel and cooling system type
+        df_coef = analysis.get_fuel_cool(df_abido_coef)
 
-    # Get water use coefficients
-    df_coef = analysis.get_water_use_rate(df_coef, df_macknick_coef)
+        # Get emission coefficients
+        df_coef = analysis.get_emission_coef(df_coef)
 
-    # Assign coefficients
-    net.df_coef = df_coef
+        # Get water use coefficients
+        df_coef = analysis.get_water_use_rate(df_coef, df_macknick_coef)
 
-    # Sample decision space
-    df_gen_info = analysis.get_generator_information(net)
-    df_gen_info = df_gen_info[df_gen_info['et'] != 'ext_grid']  # External grid will be solved during power flow
-    df_gridspecs = pd.DataFrame(
-        {
-            'var': df_gen_info['bus'].astype(int).tolist(),
-            'min': df_gen_info['min_p_mw'].tolist(),
-            'max': df_gen_info['max_p_mw'].tolist(),
-            'steps': n_steps
-        }
-    )
-    df_grid = analysis.grid_sample(df_gridspecs)
+        # Assign coefficients
+        net.df_coef = df_coef
 
-    # Solve opf
-    df_results = df_grid.apply(
-        lambda row: analysis.mo_opf(row, net),
-        axis=1
-    )
-    df_results = pd.concat([df_grid, df_results], axis=1)
+        # Sample decision space
+        df_gen_info = analysis.get_generator_information(net)
+        df_gen_info = df_gen_info[df_gen_info['et'] != 'ext_grid']  # External grid will be solved during power flow
+        df_gridspecs = pd.DataFrame(
+            {
+                'var': df_gen_info['bus'].astype(int).tolist(),
+                'min': df_gen_info['min_p_mw'].tolist(),
+                'max': df_gen_info['max_p_mw'].tolist(),
+                'steps': n_steps
+            }
+        )
+        df_grid = analysis.grid_sample(df_gridspecs)
+
+        # Solve opf
+        df_grid_results = df_grid.apply(
+            lambda row: analysis.mo_opf(row, net),
+            axis=1
+        )
+        df_grid_results = pd.concat([df_grid, df_grid_results], axis=1)
+        df_grid_results = df_grid_results.dropna()
+        df_grid_results.to_csv(inputs['path_to_df_grid_results'])  # Save checkpoint
 
     return 0
 
