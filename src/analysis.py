@@ -28,23 +28,24 @@ def input_parse(path_to_config=None):
     config_inputs = configparser.ConfigParser()
     argparse_inputs = argparse.ArgumentParser()
 
-    # Command line arguments (these get priority)
-    argparse_inputs.add_argument(
-        '-c',
-        '--config_file',
-        type=str,
-        action='store',
-        help='Path to configuration file',
-        required=True
-    )
-
-    # Parse arguments
-    argparse_inputs = argparse_inputs.parse_args()
-
-    # Parse config file
-    config_inputs.read(argparse_inputs.config_file)
     if path_to_config:
         config_inputs.read(path_to_config)
+    else:
+        # Command line arguments (these get priority)
+        argparse_inputs.add_argument(
+            '-c',
+            '--config_file',
+            type=str,
+            action='store',
+            help='Path to configuration file',
+            required=True
+        )
+
+        # Parse arguments
+        argparse_inputs = argparse_inputs.parse_args()
+
+        # Parse config file
+        config_inputs.read(argparse_inputs.config_file)
 
     # Store inputs
     path_to_data = config_inputs['MAIN IO']['data']
