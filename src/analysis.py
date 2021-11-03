@@ -119,8 +119,9 @@ def mo_opf(ser_decisions, net):
     net = copy.deepcopy(net)
 
     # Apply decision to network
+    ser_decisions.name = 'p_mw_decisions'
     net.gen = net.gen.merge(ser_decisions, left_on='bus', right_index=True)
-    net.gen['p_mw'] = net.gen[0]
+    net.gen['p_mw'] = net.gen['p_mw_decisions']
 
     # Solve powerflow
     pp.rundcpp(net)
