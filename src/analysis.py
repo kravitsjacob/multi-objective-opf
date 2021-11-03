@@ -130,7 +130,7 @@ def mo_opf(ser_decisions, net):
     df_obj = df_obj.merge(net.df_coef, left_on=['element', 'et'], right_on=['element', 'et'])
 
     # Compute objectives terms
-    df_obj['F_cost'] = df_obj['a'] + df_obj['b'] * (df_obj['p_mw']/100) + df_obj['c'] * (df_obj['p_mw']/100)**2
+    df_obj['F_cos'] = df_obj['a'] + df_obj['b'] * (df_obj['p_mw']/100) + df_obj['c'] * (df_obj['p_mw']/100)**2
     df_obj['F_emit'] = \
         0.01 * df_obj['alpha'] +\
         0.01 * df_obj['beta_emit'] * (df_obj['p_mw']/100) +\
@@ -140,5 +140,18 @@ def mo_opf(ser_decisions, net):
     df_obj['F_con'] = df_obj['beta_with'] * df_obj['p_mw'] * t
 
     # Compute objectives
+    df_obj_sum = df_obj.sum()
+    f_cos = df_obj_sum['F_cos']
+    f_emit = df_obj_sum['F_emit']
+    f_with = df_obj_sum['F_with']
+    f_con = df_obj_sum['F_con']
+    ser_obj = pd.Series(
+        {
+            'F_cos': f_cos,
+            'F_emit': f_emit,
+            'F_with': f_with,
+            'F_con': f_con
+        }
+    )
 
-    return ser_objectives
+    return ser_obj
