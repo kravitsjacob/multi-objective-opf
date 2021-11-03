@@ -41,6 +41,15 @@ def input_parse(path_to_config=None):
             help='Path to configuration file',
             required=True
         )
+        argparse_inputs.add_argument(
+            '-nt',
+            '--n_tasks',
+            type=int,
+            default=2,
+            action='store',
+            help='Number of tasks for parallelization',
+            required=False
+        )
 
         # Parse arguments
         argparse_inputs = argparse_inputs.parse_args()
@@ -58,7 +67,8 @@ def input_parse(path_to_config=None):
             path_to_data,
             config_inputs['GENERATED_FILES']['path_to_df_grid_results']
         ),
-        'path_to_df_nondom': os.path.join(path_to_data, config_inputs['GENERATED_FILES']['path_to_df_nondom'])
+        'path_to_df_nondom': os.path.join(path_to_data, config_inputs['GENERATED_FILES']['path_to_df_nondom']),
+        'n_tasks': argparse_inputs.n_tasks
     }
 
     return inputs
