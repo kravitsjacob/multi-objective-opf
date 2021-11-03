@@ -258,7 +258,24 @@ def get_fuel_cool(df_abido_coef):
 
 
 def get_emission_coef(df_coef):
-    a = 1
-    # Nuclear has no pollution
+    """
+    Overwrite emissions coefficients for nuclear generators
+
+    Parameters
+    ----------
+    df_coef: DataFrame
+        Coefficients dataframe with fuel and cooling systems assigned
+
+    Returns
+    -------
+    df_coef: DataFrame
+        Updated coefficients dataframe with nuclear emission coefficients adjusted
+    """
+    # Local vars
+    emit_cols = ['alpha', 'beta_emit', 'gamma', 'xi', 'lambda']
+
+    # Nuclear has no air pollution
+    nuc_idx = df_coef[df_coef['fuel_type'] == 'Nuclear'].index
+    df_coef.loc[nuc_idx, emit_cols] = 0.0
 
     return df_coef
