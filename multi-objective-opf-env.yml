@@ -5,6 +5,5 @@ channels:
 dependencies:
   - python=3.9
   - pandapower
-  - pyomo
   - dask-core
 prefix: C:\Users\kravi\.conda\envs\multi-objective-opf-env
