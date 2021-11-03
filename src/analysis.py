@@ -113,6 +113,42 @@ def grid_sample(df_gridspecs):
     return df_grid
 
 
+def compute_objective_terms(df, t):
+    """
+    Compute objective terms
+
+    Parameters
+    ----------
+    df: DataFrame
+        DataFrame with columns ['p_mw', 'a', 'b', 'c', 'alpha', 'beta_emit', 'gamma', 'xi', 'lambda', 'beta_with',
+         'beta_con']
+    t: float
+        Time step conversion factor
+
+    Returns
+    -------
+    df: DataFrame
+        Dataframe with objective terms computed in objective columns
+    """
+    # Cost
+    df['F_cos'] = df['a'] + df['b'] * (df['p_mw'] / 100) + df['c'] * (df['p_mw'] / 100) ** 2
+
+    # Emissions
+    df['F_emit'] = \
+        0.01 * df['alpha'] + \
+        0.01 * df['beta_emit'] * (df['p_mw'] / 100) + \
+        0.01 * df['gamma'] * (df['p_mw'] / 100) ** 2 + \
+        df['xi'] * np.exp(df['lambda'] * (df['p_mw'] / 100))
+
+    # Withdrawal
+    df['F_with'] = df['beta_with'] * df['p_mw'] * t
+
+    # Consumption
+    df['F_con'] = df['beta_with'] * df['p_mw'] * t
+
+    return df
+
+
 def mo_opf(ser_decisions, net):
     """
     Multi-objective optimal power flow
@@ -151,14 +187,7 @@ def mo_opf(ser_decisions, net):
         df_obj = df_obj.merge(net.df_coef, left_on=['element', 'et'], right_on=['element', 'et'])
 
         # Compute objectives terms
-        df_obj['F_cos'] = df_obj['a'] + df_obj['b'] * (df_obj['p_mw']/100) + df_obj['c'] * (df_obj['p_mw']/100)**2
-        df_obj['F_emit'] = \
-            0.01 * df_obj['alpha'] +\
-            0.01 * df_obj['beta_emit'] * (df_obj['p_mw']/100) +\
-            0.01 * df_obj['gamma'] * (df_obj['p_mw']/100)**2 +\
-            df_obj['xi'] * np.exp(df_obj['lambda'] * (df_obj['p_mw']/100))
-        df_obj['F_with'] = df_obj['beta_with'] * df_obj['p_mw'] * t
-        df_obj['F_con'] = df_obj['beta_with'] * df_obj['p_mw'] * t
+        df_obj = compute_objective_terms(df_obj, t)
 
         # Compute objectives
         df_obj_sum = df_obj.sum()
