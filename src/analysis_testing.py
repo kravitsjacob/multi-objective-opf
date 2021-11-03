@@ -71,7 +71,7 @@ class AnalysisLib(unittest.TestCase):
         net.df_coef = pd.DataFrame(dict_coef)
 
         # Run
-        ser_decisions = pd.Series({1: 10.0, 4: 29.0, 7: 52.0, 10: 100.0, 12: 52.0}, name=0)
+        ser_decisions = pd.Series({1: 10.0, 4: 29.0, 7: 52.0, 10: 100.0, 12: 52.0})
         ser_obj = analysis.mo_opf(ser_decisions, net)
 
         # Test
