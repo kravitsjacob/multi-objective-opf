@@ -9,6 +9,7 @@ import copy
 import numpy as np
 import pandas as pd
 import pandapower as pp
+import pymoo.util.nds.non_dominated_sorting as nds
 
 
 def input_parse(path_to_config=None):
@@ -320,3 +321,35 @@ def get_water_use_rate(df_coef, df_macknick_coef):
     df_coef['beta_con'] = df_coef['consumption_rate_(gal/MWh)']
 
     return df_coef
+
+
+def get_nondomintated(df, objs, max_objs=None):
+    """
+    Get nondominated filtered DataFrame
+
+    Parameters
+    ----------
+    df: DataFrame
+        DataFrame for nondomination
+    objs: list
+        List of strings correspond to column names of objectives
+    max_objs: list (Optional)
+        List of objective to maximize
+
+    Returns
+    -------
+    df_nondom: DataFrame
+        Nondominatated DataFrame
+    """
+    # Create temporary dataframe for sorting
+    df_sort = df.copy()
+
+    # Flip objectives to maximize
+    if max_objs is not None:
+        df_sort[max_objs] = -1.0 * df_sort[max_objs]
+
+    # Non-dominated sorting
+    nondom_idx = nds.find_non_dominated(df_sort[objs].values)
+    df_nondom = df.iloc[nondom_idx].reset_index(drop=True)
+
+    return df_nondom
