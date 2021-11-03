@@ -70,6 +70,19 @@ class AnalysisLib(unittest.TestCase):
     def test_abido_2003(self, net=net):
         """
         Can't use paper as direct comparison due to different formulation, can compare orders of magnitude
+        @article{abido_novel_2003,
+            title = {A novel multiobjective evolutionary algorithm for environmental/economic power dispatch},
+            volume = {65},
+            issn = {0378-7796},
+            url = {https://dx.doi.org/10.1016/s0378-7796(02)00221-3},
+            doi = {10.1016/s0378-7796(02)00221-3},
+            number = {1},
+            journal = {Electric Power Systems Research},
+            author = {Abido, M.A.},
+            year = {2003},
+            note = {Publisher: Elsevier BV},
+            pages = {71--81},
+        }
         """
         # Run
         ser_decisions = pd.Series({1: 10.0, 4: 29.0, 7: 52.0, 10: 100.0, 12: 52.0})
