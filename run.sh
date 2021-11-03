@@ -4,7 +4,7 @@
 eval "$(conda shell.bash hook)"
 
 # Create conda environment
-conda env create -f multi-objective-opf-env.yml
+conda env create -f environment.yml
 
 # Load conda environment
 conda activate multi-objective-opf-env
