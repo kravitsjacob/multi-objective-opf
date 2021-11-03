@@ -2,6 +2,7 @@
 
 import pandapower.networks
 import pandas as pd
+import numpy as np
 
 from src import analysis
 
@@ -10,11 +11,25 @@ def main():
     # Inputs
     n_steps = 2
     inputs = analysis.input_parse()
-    df_coef = pd.read_csv(inputs['path_to_df_coef'])
     net = pandapower.networks.case_ieee30()
+    df_abido_coef = pd.read_csv(inputs['path_to_df_abido_coef'])
 
-    # Get coefficients TODO
-    net.df_coef = df_coef
+    # Fuel and cooling system type
+    analysis.get_fuel_cool(df_abido_coef)
+
+    # Get emission coefficients
+
+    # Get water use coefficients
+
+
+    # Get coefficients
+    df_temp = df_abido_coef.copy()
+    df_temp['p_mw'] = 50.0
+    df_objective_components = analysis.compute_objective_terms(df_temp, t=np.nan)
+    a = 1
+
+    net.df_coef = df_abido_coef
+
 
     # Sample decision space
     df_gen_info = analysis.get_generator_information(net)
@@ -34,6 +49,7 @@ def main():
         lambda row: analysis.mo_opf(row, net),
         axis=1
     )
+
     return 0
 
 
