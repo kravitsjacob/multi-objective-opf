@@ -4,6 +4,7 @@ import os
 
 import pandapower.networks
 import pandas as pd
+import dask.dataframe as dd
 
 from src import analysis
 
@@ -11,6 +12,7 @@ from src import analysis
 def main():
     # Inputs
     n_steps = 2
+    obj_labs = ['F_cos', 'F_emit', 'F_with', 'F_con']
     inputs = analysis.input_parse()
 
     if not os.path.exists(inputs['path_to_df_grid_results']):
@@ -43,11 +45,14 @@ def main():
         )
         df_grid = analysis.grid_sample(df_gridspecs)
 
-        # Solve opf
-        df_grid_results = df_grid.apply(
+        # Solve opf for each grid entry
+        ddf_grid = dd.from_pandas(df_grid, npartitions=inputs['n_tasks'])
+        df_grid_results = ddf_grid.apply(
             lambda row: analysis.mo_opf(row, net),
-            axis=1
-        )
+            axis=1,
+            meta=pd.DataFrame(columns=obj_labs, dtype='float64')
+        ).compute(scheduler='processes')
+
         df_grid_results = pd.concat([df_grid, df_grid_results], axis=1)
         df_grid_results = df_grid_results.dropna()
 
@@ -59,7 +64,7 @@ def main():
         df_grid_results = pd.read_csv(inputs['path_to_df_grid_results'])
 
         # Nondominated filter
-        df_nondom = analysis.get_nondomintated(df_grid_results, objs=['F_cos', 'F_emit', 'F_with', 'F_con'])
+        df_nondom = analysis.get_nondomintated(df_grid_results, objs=obj_labs)
 
         # Save checkpoint
         df_nondom.to_csv(inputs['path_to_df_nondom'], index=False)
