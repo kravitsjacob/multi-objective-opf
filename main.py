@@ -58,7 +58,6 @@ def main():
         ).compute(scheduler='processes')
 
         df_grid_results = pd.concat([df_grid, df_grid_results], axis=1)
-        df_grid_results = df_grid_results.dropna()
 
         # Save checkpoint
         df_grid_results.to_csv(inputs['path_to_df_grid_results'], index=False)
@@ -66,6 +65,9 @@ def main():
     if not os.path.exists(inputs['path_to_df_nondom']):
         # Load required checkpoints
         df_grid_results = pd.read_csv(inputs['path_to_df_grid_results'])
+
+        # Drop na
+        df_grid_results = df_grid_results.dropna()
 
         # Nondominated filter
         df_nondom = analysis.get_nondomintated(df_grid_results, objs=obj_labs)
