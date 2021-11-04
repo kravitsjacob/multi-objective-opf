@@ -133,3 +133,7 @@ dmypy.json
 
 # Slurm stuff
 run.out
+
+# Pareto
+pareto
+src/pareto
