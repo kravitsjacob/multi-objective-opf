@@ -2,17 +2,18 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=1000
 #SBATCH --output=run.out
 #SBATCH --job-name=gosox
 #SBATCH --partition=shas
 #SBATCH --qos=condo
 #SBATCH --account=ucb-summit-jrk
-#SBATCH --time=0-05:00:00
+#SBATCH --time=0-00:05:00
 #SBATCH --mail-user=kravitsjacob@gmail.com
 #SBATCH --mail-type=END
 
-module purge
+module purge s
 source /curc/sw/anaconda3/2019.07/bin/activate
 
 # Create conda environment
@@ -25,4 +26,4 @@ conda activate multi-objective-opf-env
 pip install -U pymoo
 
 # Run analysis
-python -u main.py -c config.ini --n_tasks 4
+python -u main.py -c config.ini --n_tasks 8 --n_steps 6
