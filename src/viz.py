@@ -11,6 +11,8 @@ from sklearn.preprocessing import MinMaxScaler
 import matplotlib as mpl
 from matplotlib import cm
 from itertools import chain
+import seaborn as sns
+sns.set()
 
 
 def k_means(df, n_clusters, cluster_columns):
@@ -187,12 +189,19 @@ def static_parallel(
         plt.legend(
             [plt.Line2D((0, 1), (0, 0), color=i) for i in df['Color'][df['Color Label'].drop_duplicates().index].values],
             df['Color Label'][df['Color Label'].drop_duplicates().index],
-            bbox_to_anchor=(1.2, 1), loc=2, borderaxespad=0.0)
+            bbox_to_anchor=(1.2, 1), loc=2, borderaxespad=0.0
+        )
     if plot_colorbar:
         ax = plt.axes(colorbar_adjust_args)
         cmap = cm.get_cmap(colorbar_colormap)
         norm = mpl.colors.Normalize(vmin=df['Color Index'].min(), vmax=df['Color Index'].max())
-        mpl.colorbar.ColorbarBase(ax, cmap=cmap.reversed(), norm=norm, orientation='vertical', label=df.iloc[0]['Color Label'])
+        mpl.colorbar.ColorbarBase(
+            ax,
+            cmap=cmap.reversed(),
+            norm=norm,
+            orientation='vertical',
+            label=df.iloc[0]['Color Label']
+        )
     plt.show()
     return fig
 
@@ -227,6 +236,38 @@ def main():
     df['Color Label'] = ['a', 'b', 'c']
     static_parallel(df=df, columns=obj_labs, plot_legend=True)
     return 0
+
+
+def correlation_heatmap(df):
+    """
+    Get correlation heatmap of objectives
+
+    Parameters
+    ----------
+    df: DataFrame
+        DataFrame to visualize
+
+    Returns
+    -------
+    fig: matplotlib.figure.Figure
+        Correlation heatmap figure
+    """
+    # Compute correlation
+    df_corr = df.corr()
+
+    # Get mask for lower triangle
+    mask = np.triu(np.ones_like(df_corr, dtype=np.bool))
+    np.fill_diagonal(mask, False)
+
+    # Plot
+    g = sns.heatmap(df_corr, mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
+    plt.tight_layout()
+    fig = g.figure
+
+    # Show Plot
+    plt.show()
+
+    return fig
 
 
 if __name__ == '__main__':
