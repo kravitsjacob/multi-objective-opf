@@ -68,7 +68,11 @@ def input_parse(path_to_config=None):
             config_inputs['GENERATED_FILES']['path_to_df_grid_results']
         ),
         'path_to_df_nondom': os.path.join(path_to_data, config_inputs['GENERATED_FILES']['path_to_df_nondom']),
-        'n_tasks': argparse_inputs.n_tasks
+        'n_tasks': argparse_inputs.n_tasks,
+        'path_to_nondom_objectives_viz': os.path.join(
+            path_to_data,
+            config_inputs['FIGURES']['path_to_nondom_objectives_viz']
+        ),
     }
 
     return inputs
