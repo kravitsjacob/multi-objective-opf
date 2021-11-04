@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=24
+#SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=1
 #SBATCH --output=run.out
 #SBATCH --job-name=gosox
@@ -25,4 +25,4 @@ conda activate multi-objective-opf-env
 pip install -U pymoo
 
 # Run analysis
-python -u main.py -c config.ini --n_tasks 24
+python -u main.py -c config.ini --n_tasks 4
