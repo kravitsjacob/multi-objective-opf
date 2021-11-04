@@ -70,7 +70,7 @@ def main():
         df_grid_results = df_grid_results.dropna()
 
         # Nondominated filter
-        df_nondom = analysis.get_nondomintated(df_grid_results, objs=obj_labs)
+        df_nondom = analysis.get_epsilon_nondomintated(df_grid_results, objs=obj_labs, epsilons=[10.0, 0.01, 1000.00, 1000.00])
 
         # Save checkpoint
         df_nondom.to_csv(inputs['path_to_df_nondom'], index=False)
