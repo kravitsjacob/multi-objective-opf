@@ -9,10 +9,11 @@
 #SBATCH --partition=shas
 #SBATCH --qos=condo
 #SBATCH --account=ucb-summit-jrk
-#SBATCH --time=0-00:06:00
+#SBATCH --time=0-00:20:00
 #SBATCH --mail-user=kravitsjacob@gmail.com
 #SBATCH --mail-type=END
 
+# Setup
 module purge s
 source /curc/sw/anaconda3/2019.07/bin/activate
 
@@ -27,5 +28,5 @@ pip install -U pymoo
 git clone https://github.com/matthewjwoodruff/pareto.py.git pareto
 git clone https://github.com/matthewjwoodruff/pareto.py.git src/pareto
 
-# Run analysis (only grid search, not nondom)
-python -u main.py -c config.ini --n_tasks 32 --n_steps 8
+# Run analysis
+python -u main.py -c config.ini --n_tasks 32 --n_steps 10
