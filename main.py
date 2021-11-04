@@ -12,7 +12,6 @@ from src import viz
 
 def main():
     # Inputs
-    n_steps = 2
     dec_labs = ['1', '4', '7', '10', '12', '0']
     obj_labs = ['F_cos', 'F_emit', 'F_with', 'F_con']
     inputs = analysis.input_parse()
@@ -42,7 +41,7 @@ def main():
                 'var': df_gen_info['bus'].astype(int).tolist(),
                 'min': df_gen_info['min_p_mw'].tolist(),
                 'max': df_gen_info['max_p_mw'].tolist(),
-                'steps': n_steps
+                'steps': inputs['n_steps']
             }
         )
         df_grid = analysis.grid_sample(df_gridspecs)

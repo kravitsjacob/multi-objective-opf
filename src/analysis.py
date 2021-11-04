@@ -50,6 +50,15 @@ def input_parse(path_to_config=None):
             help='Number of tasks for parallelization',
             required=False
         )
+        argparse_inputs.add_argument(
+            '-ns',
+            '--n_steps',
+            type=int,
+            default=10,
+            action='store',
+            help='Number of steps for grid search',
+            required=False
+        )
 
         # Parse arguments
         argparse_inputs = argparse_inputs.parse_args()
@@ -69,6 +78,7 @@ def input_parse(path_to_config=None):
         ),
         'path_to_df_nondom': os.path.join(path_to_data, config_inputs['GENERATED_FILES']['path_to_df_nondom']),
         'n_tasks': argparse_inputs.n_tasks,
+        'n_steps': argparse_inputs.n_steps,
         'path_to_nondom_objectives_viz': os.path.join(
             path_to_data,
             config_inputs['FIGURES']['path_to_nondom_objectives_viz']
