@@ -25,4 +25,4 @@ conda activate multi-objective-opf-env
 pip install -U pymoo
 
 # Run analysis
-python -u main.py -c config.ini -n_tasks 24
+python -u main.py -c config.ini --n_tasks 24
