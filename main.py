@@ -14,6 +14,8 @@ def main():
     # Inputs
     dec_labs = ['1', '4', '7', '10', '12', '0']
     obj_labs = ['F_cos', 'F_emit', 'F_with', 'F_con']
+    dec_labs_pretty = ['Gen ' + i + ' (MW)' for i in dec_labs]
+    obj_labs_pretty = ['Cost ($)', 'Emissions ($)', 'Withdrawal (Gal)', 'Consumption (Gal)']
     inputs = analysis.input_parse()
 
     if not os.path.exists(inputs['path_to_df_grid_results']):
@@ -75,8 +77,6 @@ def main():
         df_nondom = pd.read_csv(inputs['path_to_df_nondom'])
 
         # Formatting
-        dec_labs_pretty = ['Gen ' + i + ' (MW)' for i in dec_labs]
-        obj_labs_pretty = ['Cost ($)', 'Emissions ($)', 'Withdrawal (Gal)', 'Consumption (Gal)']
         df_nondom = df_nondom.rename(dict(zip(dec_labs+obj_labs, dec_labs_pretty+obj_labs_pretty)), axis=1)
         df_nondom['Color Index'] = df_nondom['Cost ($)']
         df_nondom = viz.set_color_gradient(df_nondom, colormap='viridis', label='Cost ($)')
@@ -98,6 +98,16 @@ def main():
         ).savefig(
             inputs['path_to_nondom_decisions_viz']
         )
+
+    if not os.path.exists(inputs['path_to_objective_correlation_viz']):
+        # Load required checkpoints
+        df_nondom = pd.read_csv(inputs['path_to_df_nondom'])
+
+        # Formatting
+        df_nondom = df_nondom.rename(dict(zip(dec_labs + obj_labs, dec_labs_pretty + obj_labs_pretty)), axis=1)
+
+        # Plotting
+        viz.correlation_heatmap(df_nondom[obj_labs_pretty]).savefig(inputs['path_to_objective_correlation_viz'])
 
     return 0
 
