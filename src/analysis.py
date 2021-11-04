@@ -183,8 +183,8 @@ def mo_opf(ser_decisions, net):
 
     Returns
     -------
-    ser_obj: Series
-        Series of objective values
+    ser_results: Series
+        Series of objective values and internal decision
     """
     # Local vars
     t = 5 * 1 / 60  # minutes * hr/minutes
@@ -200,7 +200,8 @@ def mo_opf(ser_decisions, net):
     pp.rundcpp(net)
 
     # Check if external generator is outside limits
-    ext_gen_in_limits = net.ext_grid['min_p_mw'][0] < net.res_ext_grid['p_mw'][0] < net.ext_grid['max_p_mw'][0]
+    ext_grid_p_mw = net.res_ext_grid['p_mw'][0]
+    ext_gen_in_limits = net.ext_grid['min_p_mw'][0] < ext_grid_p_mw < net.ext_grid['max_p_mw'][0]
 
     if ext_gen_in_limits:
         # Formatting results
@@ -216,8 +217,9 @@ def mo_opf(ser_decisions, net):
         f_emit = df_obj_sum['F_emit']
         f_with = df_obj_sum['F_with']
         f_con = df_obj_sum['F_con']
-        ser_obj = pd.Series(
+        ser_results = pd.Series(
             {
+                0: ext_grid_p_mw,
                 'F_cos': f_cos,
                 'F_emit': f_emit,
                 'F_with': f_with,
@@ -225,8 +227,9 @@ def mo_opf(ser_decisions, net):
             }
         )
     else:
-        ser_obj = pd.Series(
+        ser_results = pd.Series(
             {
+                0: np.nan,
                 'F_cos': np.nan,
                 'F_emit': np.nan,
                 'F_with': np.nan,
@@ -234,7 +237,7 @@ def mo_opf(ser_decisions, net):
             }
         )
 
-    return ser_obj
+    return ser_results
 
 
 def get_fuel_cool(df_abido_coef):
