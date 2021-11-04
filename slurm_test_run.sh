@@ -3,12 +3,13 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=2
 #SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=5000
 #SBATCH --output=run.out
 #SBATCH --job-name=gosox
 #SBATCH --partition=shas
 #SBATCH --qos=condo
 #SBATCH --account=ucb-summit-jrk
-#SBATCH --time=0-00:05:00
+#SBATCH --time=0-00:01:00
 #SBATCH --mail-user=kravitsjacob@gmail.com
 #SBATCH --mail-type=END
 
