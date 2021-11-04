@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import pandapower as pp
 import pymoo.util.nds.efficient_non_dominated_sort as ends
+from pareto import pareto as pto
 
 
 def input_parse(path_to_config=None):
@@ -392,5 +393,44 @@ def get_nondomintated(df, objs, max_objs=None):
     # Non-dominated sorting
     nondom_idx = ends.efficient_non_dominated_sort(df_sort[objs].values)
     df_nondom = df.iloc[nondom_idx[0]].sort_index()
+
+    return df_nondom
+
+
+def get_epsilon_nondomintated(df, objs, epsilons, max_objs=None):
+    """
+    Get epsilon nondominated filtered DataFrame
+
+    Parameters
+    ----------
+    df: DataFrame
+        DataFrame for nondomination
+    objs: list
+        List of strings correspond to column names of objectives
+    epsilons: list
+        List of floats specifying epsilons for pareto sorting
+    max_objs: list (Optional)
+        List of objective to maximize
+    Returns
+    -------
+    df_nondom: DataFrame
+        Nondominatated DataFrame
+    """
+    # Get indices of objectives
+    objs_ind = [df.columns.get_loc(col) for col in objs]
+    try:
+        max_ind = [df.columns.get_loc(col) for col in max_objs]
+    except TypeError:
+        max_ind = None
+
+    # Nondominated sorting
+    non_dominated = pto.eps_sort([list(df.itertuples(False))], objs_ind, epsilons, maximize=max_ind)
+
+    # To DataFrame
+    df_nondom = pd.DataFrame(non_dominated, columns=df.columns)
+
+    # Get original index
+    df_nondom = df.reset_index().merge(df_nondom).set_index('index')
+    df_nondom.index.name = None
 
     return df_nondom
