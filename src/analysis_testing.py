@@ -102,46 +102,42 @@ class AnalysisLib(unittest.TestCase):
         # Check
         self.assertTrue(np.isnan(ser_obj['F_cos']))
 
-    def test_get_nondomintated_default(self):
-        # Setup
-        df_test = pd.DataFrame({'A': [3, 2, 2], 'B': [3, 1, 2], 'C': [3, 2, 1]}, index=[0, 1, 2])
-        df_expect = pd.DataFrame({'A': [2, 2], 'B': [1, 2], 'C': [2, 1]}, index=[1, 2])
+    # Setup
+    df_test = pd.DataFrame({'A': [3, 2, 2], 'B': [3, 1, 2], 'C': [3, 2, 1]}, index=[0, 1, 2])
+    df_expect = pd.DataFrame({'A': [2, 2], 'B': [1, 2], 'C': [2, 1]}, index=[1, 2])
 
+    def test_get_nondomintated_default(self, df_test=df_test, df_expect=df_expect):
         # Run
         df_result = analysis.get_nondomintated(df_test, objs=['A', 'B', 'C'])
 
         # Check equal
         self.assertEqual(df_expect, df_result)
 
-    def test_get_nondomintated_max(self):
-        # Setup
-        df_test = pd.DataFrame({'A': [2, 2, 1], 'B': [3, 3, 1], 'C': [3, 2, 1]}, index=[0, 1, 2])
-        df_expect = pd.DataFrame({'A': [2, 1], 'B': [3, 1], 'C': [3, 1]}, index=[0, 2])
-
-        # Run
-        df_result = analysis.get_nondomintated(df_test, objs=['A', 'B', 'C'], max_objs=['C'])
-
-        # Check equal
-        self.assertEqual(df_expect, df_result)
-
-    def test_get_epsilon_nondomintated_default(self):
-        # Setup
-        df_test = pd.DataFrame({'A': [3, 2, 2], 'B': [3, 1, 2], 'C': [3, 2, 1]}, index=[0, 1, 2])
-        df_expect = pd.DataFrame({'A': [2, 2], 'B': [1, 2], 'C': [2, 1]}, index=[1, 2])
-
+    def test_get_epsilon_nondomintated_default(self, df_test=df_test, df_expect=df_expect):
         # Run
         df_result = analysis.get_epsilon_nondomintated(df_test, objs=['A', 'B', 'C'], epsilons=[0.1, 0.1, 0.1])
 
         # Check equal
         self.assertEqual(df_expect, df_result)
 
-    def test_get_epsilon_nondomintated_max(self):
-        # Setup
-        df_test = pd.DataFrame({'A': [2, 2, 1], 'B': [3, 3, 1], 'C': [3, 2, 1]}, index=[0, 1, 2])
-        df_expect = pd.DataFrame({'A': [2, 1], 'B': [3, 1], 'C': [3, 1]}, index=[0, 2])
+    # Setup
+    df_test = pd.DataFrame({'A': [2, 2, 1], 'B': [3, 3, 1], 'C': [3, 2, 1]}, index=[0, 1, 2])
+    df_expect = pd.DataFrame({'A': [2, 1], 'B': [3, 1], 'C': [3, 1]}, index=[0, 2])
 
+    def test_get_nondomintated_max(self, df_test=df_test, df_expect=df_expect):
         # Run
-        df_result = analysis.get_epsilon_nondomintated(df_test, objs=['A', 'B', 'C'], max_objs=['C'], epsilons=[0.1, 0.1, 0.1])
+        df_result = analysis.get_nondomintated(df_test, objs=['A', 'B', 'C'], max_objs=['C'])
+
+        # Check equal
+        self.assertEqual(df_expect, df_result)
+
+    def test_get_epsilon_nondomintated_max(self, df_test=df_test, df_expect=df_expect):
+        # Run
+        df_result = analysis.get_epsilon_nondomintated(
+            df_test, objs=['A', 'B', 'C'],
+            max_objs=['C'],
+            epsilons=[0.1, 0.1, 0.1]
+        )
 
         # Check equal
         self.assertEqual(df_expect, df_result)
