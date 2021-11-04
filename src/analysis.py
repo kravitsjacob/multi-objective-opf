@@ -9,7 +9,7 @@ import copy
 import numpy as np
 import pandas as pd
 import pandapower as pp
-import pymoo.util.nds.non_dominated_sorting as nds
+import pymoo.util.nds.efficient_non_dominated_sort as ends
 
 
 def input_parse(path_to_config=None):
@@ -390,7 +390,7 @@ def get_nondomintated(df, objs, max_objs=None):
         df_sort[max_objs] = -1.0 * df_sort[max_objs]
 
     # Non-dominated sorting
-    nondom_idx = nds.find_non_dominated(df_sort[objs].values)
-    df_nondom = df.iloc[nondom_idx].reset_index(drop=True)
+    nondom_idx = ends.efficient_non_dominated_sort(df_sort[objs].values)
+    df_nondom = df.iloc[nondom_idx[0]].sort_index()
 
     return df_nondom

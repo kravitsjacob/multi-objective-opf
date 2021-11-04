@@ -104,8 +104,8 @@ class AnalysisLib(unittest.TestCase):
 
     def test_get_nondomintated_default(self):
         # Setup
-        df_test = pd.DataFrame({'A': [3, 2, 2], 'B': [3, 1, 2], 'C': [3, 2, 1]})
-        df_expect = pd.DataFrame({'A': [2, 2], 'B': [1, 2], 'C': [2, 1]})
+        df_test = pd.DataFrame({'A': [3, 2, 2], 'B': [3, 1, 2], 'C': [3, 2, 1]}, index=[0, 1, 2])
+        df_expect = pd.DataFrame({'A': [2, 2], 'B': [1, 2], 'C': [2, 1]}, index=[1, 2])
 
         # Run
         df_result = analysis.get_nondomintated(df_test, objs=['A', 'B', 'C'])
@@ -115,8 +115,8 @@ class AnalysisLib(unittest.TestCase):
 
     def test_get_nondomintated_max(self):
         # Setup
-        df_test = pd.DataFrame({'A': [2, 2, 1], 'B': [3, 3, 1], 'C': [3, 2, 1]})
-        df_expect = pd.DataFrame({'A': [2, 1], 'B': [3, 1], 'C': [3, 1]})
+        df_test = pd.DataFrame({'A': [2, 2, 1], 'B': [3, 3, 1], 'C': [3, 2, 1]}, index=[0, 1, 2])
+        df_expect = pd.DataFrame({'A': [2, 1], 'B': [3, 1], 'C': [3, 1]}, index=[0, 2])
 
         # Run
         df_result = analysis.get_nondomintated(df_test, objs=['A', 'B', 'C'], max_objs=['C'])
