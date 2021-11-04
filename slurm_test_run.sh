@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=2
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=5000
+#SBATCH --mem-per-cpu=1000
 #SBATCH --output=run.out
 #SBATCH --job-name=gosox
 #SBATCH --partition=shas
