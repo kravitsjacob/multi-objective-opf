@@ -87,6 +87,10 @@ def input_parse(path_to_config=None):
             path_to_data,
             config_inputs['FIGURES']['path_to_nondom_decisions_viz']
         ),
+        'path_to_objective_correlation_viz': os.path.join(
+            path_to_data,
+            config_inputs['FIGURES']['path_to_objective_correlation_viz']
+        ),
     }
 
     return inputs
