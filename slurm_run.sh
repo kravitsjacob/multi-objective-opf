@@ -24,6 +24,8 @@ conda activate multi-objective-opf-env
 
 # Install non-conda packages
 pip install -U pymoo
+git clone https://github.com/matthewjwoodruff/pareto.py.git pareto
+git clone https://github.com/matthewjwoodruff/pareto.py.git src/pareto
 
 # Run analysis (only grid search, not nondom)
 python -u main.py -c config.ini --n_tasks 32 --n_steps 8
