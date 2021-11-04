@@ -7,11 +7,13 @@ import pandas as pd
 import dask.dataframe as dd
 
 from src import analysis
+from src import viz
 
 
 def main():
     # Inputs
     n_steps = 2
+    dec_labs = ['1', '4', '7', '10', '12', '0']
     obj_labs = ['F_cos', 'F_emit', 'F_with', 'F_con']
     inputs = analysis.input_parse()
 
@@ -50,7 +52,7 @@ def main():
         df_grid_results = ddf_grid.apply(
             lambda row: analysis.mo_opf(row, net),
             axis=1,
-            meta=pd.DataFrame(columns=obj_labs, dtype='float64')
+            meta=pd.DataFrame(columns=[0]+obj_labs, dtype='float64')
         ).compute(scheduler='processes')
 
         df_grid_results = pd.concat([df_grid, df_grid_results], axis=1)
@@ -68,6 +70,35 @@ def main():
 
         # Save checkpoint
         df_nondom.to_csv(inputs['path_to_df_nondom'], index=False)
+
+    if not os.path.exists(inputs['path_to_nondom_objectives_viz']):
+        # Load required checkpoints
+        df_nondom = pd.read_csv(inputs['path_to_df_nondom'])
+
+        # Formatting
+        dec_labs_pretty = ['Gen ' + i + ' (MW)' for i in dec_labs]
+        obj_labs_pretty = ['Cost ($)', 'Emissions ($)', 'Withdrawal (Gal)', 'Consumption (Gal)']
+        df_nondom = df_nondom.rename(dict(zip(dec_labs+obj_labs, dec_labs_pretty+obj_labs_pretty)), axis=1)
+        df_nondom['Color Index'] = df_nondom['Cost ($)']
+        df_nondom = viz.set_color_gradient(df_nondom, colormap='viridis', label='Cost ($)')
+
+        # Plot Objectives
+        viz.static_parallel(
+            df=df_nondom,
+            columns=obj_labs_pretty,
+            plot_colorbar=True
+        ).savefig(
+            inputs['path_to_nondom_objectives_viz']
+        )
+
+        # Plot Decisions
+        viz.static_parallel(
+            df=df_nondom,
+            columns=dec_labs_pretty,
+            plot_colorbar=True
+        ).savefig(
+            inputs['path_to_nondom_decisions_viz']
+        )
 
     return 0
 
