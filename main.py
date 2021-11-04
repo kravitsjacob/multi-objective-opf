@@ -47,6 +47,7 @@ def main():
             }
         )
         df_grid = analysis.grid_sample(df_gridspecs)
+        print(f'Number of searches: {len(df_grid)}')
 
         # Solve opf for each grid entry
         ddf_grid = dd.from_pandas(df_grid, npartitions=inputs['n_tasks'])
