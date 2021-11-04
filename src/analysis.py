@@ -255,6 +255,8 @@ def mo_opf(ser_decisions, net):
             }
         )
 
+    print(ser_results)
+
     return ser_results
 
 
