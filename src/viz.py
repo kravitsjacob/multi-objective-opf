@@ -108,6 +108,7 @@ def static_parallel(
         rotate_x_labels=False):
     """
     https://benalexkeen.com/parallel-coordinates-in-matplotlib/
+    Coming soon, this will be turned into a proper module
 
     Parameters
     ----------
