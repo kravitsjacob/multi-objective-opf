@@ -14,6 +14,7 @@ def main():
     # Inputs
     dec_labs = ['1', '4', '7', '10', '12', '0']
     obj_labs = ['F_cos', 'F_emit', 'F_with', 'F_con']
+    obj_epsi = [10.0, 0.01, 1000.00, 1000.00]
     dec_labs_pretty = ['Gen ' + i + ' (MW)' for i in dec_labs]
     obj_labs_pretty = ['Cost ($)', 'Emissions ($)', 'Withdrawal (Gal)', 'Consumption (Gal)']
     inputs = analysis.input_parse()
@@ -70,7 +71,11 @@ def main():
         df_grid_results = df_grid_results.dropna()
 
         # Nondominated filter
-        df_nondom = analysis.get_epsilon_nondomintated(df_grid_results, objs=obj_labs, epsilons=[10.0, 0.01, 1000.00, 1000.00])
+        df_nondom = analysis.get_epsilon_nondomintated(
+            df_grid_results,
+            objs=obj_labs,
+            epsilons=obj_epsi
+        )
 
         # Save checkpoint
         df_nondom.to_csv(inputs['path_to_df_nondom'], index=False)
