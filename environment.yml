@@ -1,0 +1,11 @@
+name: multi-objective-opf-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pandapower
+  - python=3.9
+  - dask-core
+  - scikit-learn
+  - seaborn
+prefix: C:\Users\kravi\.conda\envs\multi-objective-opf-env
