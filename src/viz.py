@@ -12,7 +12,6 @@ import matplotlib as mpl
 from matplotlib import cm
 from itertools import chain
 import seaborn as sns
-sns.set()
 
 
 def k_means(df, n_clusters, cluster_columns):
@@ -260,12 +259,15 @@ def correlation_heatmap(df):
     np.fill_diagonal(mask, False)
 
     # Plot
+    sns.set()
     g = sns.heatmap(df_corr, mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
     plt.tight_layout()
     fig = g.figure
 
     # Show Plot
     plt.show()
+
+    sns.reset_orig()
 
     return fig
 
