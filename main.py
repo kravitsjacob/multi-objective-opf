@@ -5,6 +5,7 @@ import os
 import pandapower.networks
 import pandas as pd
 import dask.dataframe as dd
+import numpy as np
 
 from src import analysis
 from src import viz
@@ -90,10 +91,19 @@ def main():
         df_nondom = viz.set_color_gradient(df_nondom, colormap='viridis', label='Cost ($)')
 
         # Plot Objectives
+        ticks = [np.arange(0, 10000, 50),
+                 np.arange(0.0, 1.0, 0.02),
+                 np.arange(0, 1000000, 50000),
+                 np.arange(0, 10000, 200)]
+        limits = [[590, 1050], [0.17, 0.40], [-1, 410000], [3550, 4900]]
         viz.static_parallel(
             df=df_nondom,
             columns=obj_labs_pretty,
-            plot_colorbar=True
+            plot_colorbar=True,
+            subplots_adjust_args={'left': 0.10, 'bottom': 0.20, 'right': 0.80, 'top': 0.95, 'wspace': 0.0,
+                                  'hspace': 0.0},
+            explicit_ticks=ticks,
+            limits=limits
         ).savefig(
             inputs['path_to_nondom_objectives_viz']
         )
@@ -102,7 +112,9 @@ def main():
         viz.static_parallel(
             df=df_nondom,
             columns=dec_labs_pretty,
-            plot_colorbar=True
+            plot_colorbar=True,
+            subplots_adjust_args={'left': 0.10, 'bottom': 0.20, 'right': 0.80, 'top': 0.95, 'wspace': 0.0,
+                                  'hspace': 0.0}
         ).savefig(
             inputs['path_to_nondom_decisions_viz']
         )
@@ -114,8 +126,8 @@ def main():
         # Formatting
         df_nondom = df_nondom.rename(dict(zip(dec_labs + obj_labs, dec_labs_pretty + obj_labs_pretty)), axis=1)
 
-        # Plotting
         viz.correlation_heatmap(df_nondom[obj_labs_pretty]).savefig(inputs['path_to_objective_correlation_viz'])
+
 
     return 0
 
