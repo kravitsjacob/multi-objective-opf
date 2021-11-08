@@ -17,7 +17,12 @@ def main():
     obj_labs = ['F_cos', 'F_emit', 'F_with', 'F_con']
     obj_epsi = [10.0, 0.01, 1000.00, 1000.00]
     dec_labs_pretty = ['Gen ' + i + ' (MW)' for i in dec_labs]
-    obj_labs_pretty = ['Cost ($)', 'Emissions ($)', 'Withdrawal (Gal)', 'Consumption (Gal)']
+    obj_labs_pretty = [
+        'Cost ($/hr)',
+        'Emissions (ton/hr)',
+        'Withdrawal (gal/hr)',
+        'Consumption (gal/hr)'
+    ]
     inputs = analysis.input_parse()
 
     if not os.path.exists(inputs['path_to_df_grid_results']):
@@ -39,7 +44,9 @@ def main():
 
         # Sample decision space
         df_gen_info = analysis.get_generator_information(net)
-        df_gen_info = df_gen_info[df_gen_info['et'] != 'ext_grid']  # External grid will be solved during power flow
+        df_gen_info = \
+            df_gen_info[df_gen_info['et'] != 'ext_grid']  # External grid
+        # solved during power flow
         df_gridspecs = pd.DataFrame(
             {
                 'var': df_gen_info['bus'].astype(int).tolist(),
@@ -86,22 +93,34 @@ def main():
         df_nondom = pd.read_csv(inputs['path_to_df_nondom'])
 
         # Formatting
-        df_nondom = df_nondom.rename(dict(zip(dec_labs+obj_labs, dec_labs_pretty+obj_labs_pretty)), axis=1)
-        df_nondom['Color Index'] = df_nondom['Cost ($)']
-        df_nondom = viz.set_color_gradient(df_nondom, colormap='viridis', label='Cost ($)')
+        df_nondom = df_nondom.rename(
+            dict(
+                zip(dec_labs+obj_labs, dec_labs_pretty+obj_labs_pretty)),
+            axis=1
+        )
+        df_nondom['Color Index'] = df_nondom['Cost ($/hr)']
+        df_nondom = viz.set_color_gradient(
+            df_nondom, colormap='viridis', label='Cost ($/hr)'
+        )
 
         # Plot Objectives
         ticks = [np.arange(0, 10000, 50),
                  np.arange(0.0, 1.0, 0.02),
-                 np.arange(0, 1000000, 50000),
-                 np.arange(0, 10000, 200)]
-        limits = [[590, 1050], [0.17, 0.40], [-1, 410000], [3550, 4900]]
+                 np.arange(0, 5100000, 500000),
+                 np.arange(0, 59000, 2000)]
+        limits = [[590, 1050], [0.17, 0.41], [-1, 5100000], [37000, 59000]]
         viz.static_parallel(
             df=df_nondom,
             columns=obj_labs_pretty,
             plot_colorbar=True,
-            subplots_adjust_args={'left': 0.10, 'bottom': 0.20, 'right': 0.80, 'top': 0.95, 'wspace': 0.0,
-                                  'hspace': 0.0},
+            subplots_adjust_args={
+                'left': 0.10,
+                'bottom': 0.20,
+                'right': 0.80,
+                'top': 0.95,
+                'wspace': 0.0,
+                'hspace': 0.0
+            },
             explicit_ticks=ticks,
             limits=limits
         ).savefig(
@@ -113,8 +132,14 @@ def main():
             df=df_nondom,
             columns=dec_labs_pretty,
             plot_colorbar=True,
-            subplots_adjust_args={'left': 0.10, 'bottom': 0.20, 'right': 0.80, 'top': 0.95, 'wspace': 0.0,
-                                  'hspace': 0.0}
+            subplots_adjust_args={
+                'left': 0.10,
+                'bottom': 0.20,
+                'right': 0.80,
+                'top': 0.95,
+                'wspace': 0.0,
+                'hspace': 0.0
+            }
         ).savefig(
             inputs['path_to_nondom_decisions_viz']
         )
@@ -124,10 +149,15 @@ def main():
         df_nondom = pd.read_csv(inputs['path_to_df_nondom'])
 
         # Formatting
-        df_nondom = df_nondom.rename(dict(zip(dec_labs + obj_labs, dec_labs_pretty + obj_labs_pretty)), axis=1)
+        df_nondom = df_nondom.rename(
+            dict(
+                zip(dec_labs + obj_labs, dec_labs_pretty + obj_labs_pretty)),
+            axis=1
+        )
 
-        viz.correlation_heatmap(df_nondom[obj_labs_pretty]).savefig(inputs['path_to_objective_correlation_viz'])
-
+        viz.correlation_heatmap(
+            df_nondom[obj_labs_pretty]
+        ).savefig(inputs['path_to_objective_correlation_viz'])
 
     return 0
 

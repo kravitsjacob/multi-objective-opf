@@ -1,4 +1,7 @@
-"""Source code for visualization"""
+"""
+Source code for visualization (heads up, this will be eventually hosted as
+an external library)
+"""
 
 
 # Import Modules
@@ -16,7 +19,9 @@ import seaborn as sns
 
 def k_means(df, n_clusters, cluster_columns):
     # K Means Clustering
-    kmeans = KMeans(n_clusters=n_clusters, random_state=1008).fit(df[cluster_columns].values)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=1008).fit(
+        df[cluster_columns].values
+    )
     df['Color Index'] = ['cluster_' + i for i in kmeans.labels_.astype(str)]
     return df
 
@@ -31,9 +36,11 @@ def set_color_cluster(df, color_idx, colors, labels):
 
 def set_color_gradient(df, colormap, label):
     # Compute Proportion of Each Line
-    mixes = (df['Color Index'] - df['Color Index'].max()) / (df['Color Index'].min() - df['Color Index'].max())
+    mixes = (df['Color Index'] - df['Color Index'].max()) /\
+            (df['Color Index'].min() - df['Color Index'].max())
     # Get Colors Corresponding to Proportions
-    df['Color'] = [mpl.colors.rgb2hex(cm.get_cmap(colormap)(i)[:3]) for i in mixes]
+    df['Color'] = [mpl.colors.rgb2hex(
+        cm.get_cmap(colormap)(i)[:3]) for i in mixes]
     df['Color Label'] = label
     return df
 
@@ -65,7 +72,9 @@ def format_ticks(
     # Format Y axis
     if explicit_ticks is None:
         step = (limits[i][1] - limits[i][0]) / (n_ticks[i] - 1)
-        tick_labels = [round(limits[i][0] + step * j, tick_precision[i]) for j in range(n_ticks[i])]
+        tick_labels = \
+            [round(limits[i][0] + step * j, tick_precision[i])
+             for j in range(n_ticks[i])]
         norm_step = 1 / float(n_ticks[i] - 1)
         ticks = [round(0 + norm_step * i, 3) for i in range(n_ticks[i])]
         ax.yaxis.set_ticks(ticks)
@@ -73,8 +82,11 @@ def format_ticks(
             tick_labels.reverse()
         ax.set_yticklabels(tick_labels)
     else:
-        lower = 0 + (df[cols[i]].min() - limits[i][0]) / (limits[i][1] - limits[i][0])
-        upper = 0.00001 + (df[cols[i]].max() - limits[i][0]) / (limits[i][1] - limits[i][0])
+        lower = 0 + (df[cols[i]].min() -
+                     limits[i][0]) / (limits[i][1] - limits[i][0])
+        upper = \
+            0.00001 + (df[cols[i]].max() - limits[i][0]) /\
+            (limits[i][1] - limits[i][0])
         scaler = MinMaxScaler(feature_range=(lower, upper))
         scaler.fit_transform(df[cols[i]].values.reshape((-1, 1)))
         ticks = scaler.transform(np.array(explicit_ticks[i]).reshape((-1, 1)))
@@ -105,7 +117,13 @@ def static_parallel(
         colorbar_colormap='viridis',
         figure_size=(11, 3),
         colorbar_adjust_args=(0.90, 0.2, 0.02, 0.70),
-        subplots_adjust_args={'left': 0.05, 'bottom': 0.20, 'right': 0.85, 'top': 0.95, 'wspace': 0.0, 'hspace': 0.0},
+        subplots_adjust_args={
+            'left': 0.05,
+            'bottom': 0.20,
+            'right': 0.85,
+            'top': 0.95,
+            'wspace': 0.0,
+            'hspace': 0.0},
         rotate_x_labels=False):
     """
     https://benalexkeen.com/parallel-coordinates-in-matplotlib/
@@ -146,11 +164,14 @@ def static_parallel(
     x = [i for i, _ in enumerate(columns)]
     # Compute Indices of Columns to Flip
     try:
-        flip_idx = [i for i, item in enumerate(columns) if item in columns_to_flip]
+        flip_idx =\
+            [i for i, item in enumerate(columns) if item in columns_to_flip]
     except TypeError:
         flip_idx = [len(x) + 1]
     # Initialize Plots
-    fig, axes = plt.subplots(1, len(columns) - 1, sharey=False, figsize=figure_size)
+    fig, axes = plt.subplots(
+        1, len(columns) - 1, sharey=False, figsize=figure_size
+    )
     if len(columns) == 2:
         axes = [axes]
     # Create Scaled DataFrame
@@ -159,7 +180,9 @@ def static_parallel(
         lower = 0 + (df[columns[i]].min() - lim[0]) / (lim[1] - lim[0])
         upper = 0.0000001 + (df[columns[i]].max() - lim[0]) / (lim[1] - lim[0])
         scaler = MinMaxScaler(feature_range=(lower, upper))
-        scaled_data = scaler.fit_transform(df[columns[i]].values.reshape((-1, 1)))
+        scaled_data = scaler.fit_transform(
+            df[columns[i]].values.reshape((-1, 1))
+        )
         if i in flip_idx:
             df_scaled[columns[i]] = 0.5 + (0.5 - scaled_data)
         else:
@@ -167,7 +190,12 @@ def static_parallel(
     # Plot each row
     for i, ax in enumerate(axes):
         for idx in df_scaled.index:
-            ax.plot(x, df_scaled.loc[idx, columns], df_scaled.loc[idx, 'Color'],  linestyle=df.loc[idx, 'Linestyle'])
+            ax.plot(
+                x,
+                df_scaled.loc[idx, columns],
+                df_scaled.loc[idx, 'Color'],
+                linestyle=df.loc[idx, 'Linestyle']
+            )
         ax.set_xlim([x[i], x[i + 1]])
         ax.set_ylim([0, 1])
     # Format Last Axis
@@ -178,22 +206,36 @@ def static_parallel(
         axes[-2].set_xticklabels(axes[-2].get_xticklabels(), rotation=90)
     # Format All Axes
     for i, ax in enumerate(axes):
-        format_ticks(i, ax, n_ticks=n_ticks, limits=limits, cols=columns, flip_idx=flip_idx, x=x,
-                     tick_precision=tick_precision, explicit_ticks=explicit_ticks, label_fontsize=label_fontsize, df=df,
-                     rotate_x_labels=rotate_x_labels)
+        format_ticks(
+            i,
+            ax,
+            n_ticks=n_ticks,
+            limits=limits,
+            cols=columns,
+            flip_idx=flip_idx,
+            x=x,
+            tick_precision=tick_precision,
+            explicit_ticks=explicit_ticks,
+            label_fontsize=label_fontsize,
+            df=df,
+            rotate_x_labels=rotate_x_labels
+        )
     # Remove space between subplots
     plt.subplots_adjust(**subplots_adjust_args)
     # Add legend to plot
     if plot_legend:
         plt.legend(
-            [plt.Line2D((0, 1), (0, 0), color=i) for i in df['Color'][df['Color Label'].drop_duplicates().index].values],
+            [plt.Line2D((0, 1), (0, 0), color=i) for i in
+             df['Color'][df['Color Label'].drop_duplicates().index].values],
             df['Color Label'][df['Color Label'].drop_duplicates().index],
             bbox_to_anchor=(1.2, 1), loc=2, borderaxespad=0.0
         )
     if plot_colorbar:
         ax = plt.axes(colorbar_adjust_args)
         cmap = cm.get_cmap(colorbar_colormap)
-        norm = mpl.colors.Normalize(vmin=df['Color Index'].min(), vmax=df['Color Index'].max())
+        norm = mpl.colors.Normalize(
+            vmin=df['Color Index'].min(), vmax=df['Color Index'].max()
+        )
         mpl.colorbar.ColorbarBase(
             ax,
             cmap=cmap.reversed(),
@@ -208,28 +250,43 @@ def static_parallel(
 def main():
     # Example Data
     obj_labs = ['Objective 1', 'Objective 2', 'Objective 3', 'Objective 4']
-    df = pd.DataFrame({'Objective 1': [0, 0.5, 1], 'Objective 2': [0, 0.5, 1], 'Objective 3': [1, 0.5, 0],
+    df = pd.DataFrame({'Objective 1': [0, 0.5, 1],
+                       'Objective 2': [0, 0.5, 1],
+                       'Objective 3': [1, 0.5, 0],
                        'Objective 4': [100, 50, 10]})  # Example Data
     df['Color Index'] = df['Objective 1']  # Specify Color
     df = set_color_gradient(df, colormap='viridis', label='Objective 1')
 
     # Example Quantitative Plotting
     static_parallel(df=df, columns=obj_labs)  # default plot
-    static_parallel(df=df, columns=obj_labs, plot_colorbar=True)  # with colorbar
-    static_parallel(df=df, columns=obj_labs, n_ticks=[10, 20, 10, 10])  # with user-specified number of ticks
+    static_parallel(
+        df=df, columns=obj_labs, plot_colorbar=True
+    )  # with colorbar
+    static_parallel(
+        df=df, columns=obj_labs, n_ticks=[10, 20, 10, 10]
+    )  # with user-specified number of ticks
     static_parallel(
         df=df,
         columns=obj_labs,
         tick_precision=[4, 2, 1, -1]
     )  # with user-specified number of ticks and precision
-    static_parallel(df=df, columns=obj_labs, columns_to_flip=['Objective 1'])  # Flipping columns
+    static_parallel(
+        df=df, columns=obj_labs, columns_to_flip=['Objective 1']
+    )  # Flipping columns
     static_parallel(
         df=df,
         columns=obj_labs,
         limits=[[0, 0.2], [0, 0.6], [0, 0.6], [10, 50]]
     )  # Setting user-specific column limits
-    ticks = [np.array([0, 0.1, 0.9]), np.array([0, 0.6, 0.9]), np.array([0, 0.5]), np.array([10, 50])]
-    static_parallel(df=df, columns=obj_labs, explicit_ticks=ticks)  # with explicit ticks
+    ticks = [
+        np.array([0, 0.1, 0.9]),
+        np.array([0, 0.6, 0.9]),
+        np.array([0, 0.5]),
+        np.array([10, 50])
+    ]
+    static_parallel(
+        df=df, columns=obj_labs, explicit_ticks=ticks
+    )  # with explicit ticks
 
     # Example Qualitative Plotting
     df['Color Label'] = ['a', 'b', 'c']
@@ -260,7 +317,9 @@ def correlation_heatmap(df):
 
     # Plot
     sns.set()
-    g = sns.heatmap(df_corr, mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
+    g = sns.heatmap(
+        df_corr, mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG'
+    )
     plt.tight_layout()
     fig = g.figure
 

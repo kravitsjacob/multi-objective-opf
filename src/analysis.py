@@ -71,13 +71,22 @@ def input_parse(path_to_config=None):
     path_to_data = config_inputs['MAIN IO']['data']
     inputs = {
         'path_to_data': path_to_data,
-        'path_to_df_abido_coef': os.path.join(path_to_data, config_inputs['INPUT']['path_to_df_abido_coef']),
-        'path_to_df_macknick_coef': os.path.join(path_to_data, config_inputs['INPUT']['path_to_df_macknick_coef']),
+        'path_to_df_abido_coef': os.path.join(
+            path_to_data,
+            config_inputs['INPUT']['path_to_df_abido_coef']
+        ),
+        'path_to_df_macknick_coef': os.path.join(
+            path_to_data,
+            config_inputs['INPUT']['path_to_df_macknick_coef']
+        ),
         'path_to_df_grid_results': os.path.join(
             path_to_data,
             config_inputs['GENERATED_FILES']['path_to_df_grid_results']
         ),
-        'path_to_df_nondom': os.path.join(path_to_data, config_inputs['GENERATED_FILES']['path_to_df_nondom']),
+        'path_to_df_nondom': os.path.join(
+            path_to_data,
+            config_inputs['GENERATED_FILES']['path_to_df_nondom']
+        ),
         'n_tasks': argparse_inputs.n_tasks,
         'n_steps': argparse_inputs.n_steps,
         'path_to_nondom_objectives_viz': os.path.join(
@@ -122,7 +131,7 @@ def get_generator_information(net, gen_types=('gen', 'sgen', 'ext_grid')):
         df_temp_gen_info['et'] = gen_type
         df_temp_gen_info['element'] = df_temp_gen_info.index.astype(float)
         df_gen_info = df_gen_info.append(df_temp_gen_info)
-    df_gen_info = df_gen_info.reset_index(drop=True)  # Important to eliminate duplicated indices
+    df_gen_info = df_gen_info.reset_index(drop=True)  # Drop duplicated indices
 
     return df_gen_info
 
@@ -134,36 +143,42 @@ def grid_sample(df_gridspecs):
     Parameters
     ----------
     df_gridspecs: DataFrame
-        Grid specifications, must have columns of ['var', 'min', 'max', 'steps']. These reflect the variable names,
-        minimum value of grid sampling, maximum value of grid sampling, and number of steps respectively.
+        Grid specifications, must have columns of
+        ['var', 'min', 'max', 'steps']. These reflect the variable names,
+        minimum value of grid sampling, maximum value of grid sampling,
+        and number of steps respectively.
 
     Returns
     -------
     df_grid: DataFrame
-        Dataframe of grid sampling. Will have columns of names specified in 'var' list
+        Dataframe of grid sampling. Will have columns of names specified in
+        'var' list
     """
     # Get linear spaces
     linspace_list = []
     for i, row in df_gridspecs.iterrows():
-        linspace_list.append(np.linspace(row['min'], row['max'], int(row['steps'])))
+        linspace_list.append(
+            np.linspace(row['min'], row['max'], int(row['steps']))
+        )
 
     # Create dataframe
-    df_grid = pd.DataFrame(list(itertools.product(*linspace_list)), columns=df_gridspecs['var'].tolist())
+    df_grid = pd.DataFrame(
+        list(itertools.product(*linspace_list)),
+        columns=df_gridspecs['var'].tolist()
+    )
 
     return df_grid
 
 
-def compute_objective_terms(df, t):
+def compute_objective_terms(df):
     """
     Compute objective terms
 
     Parameters
     ----------
     df: DataFrame
-        DataFrame with columns ['p_mw', 'a', 'b', 'c', 'alpha', 'beta_emit', 'gamma', 'xi', 'lambda', 'beta_with',
-         'beta_con']
-    t: float
-        Time step conversion factor
+        DataFrame with columns ['p_mw', 'a', 'b', 'c', 'alpha', 'beta_emit',
+         'gamma', 'xi', 'lambda', 'beta_with', 'beta_con']
 
     Returns
     -------
@@ -171,7 +186,9 @@ def compute_objective_terms(df, t):
         Dataframe with objective terms computed in objective columns
     """
     # Cost
-    df['F_cos'] = df['a'] + df['b'] * (df['p_mw'] / 100) + df['c'] * (df['p_mw'] / 100) ** 2
+    df['F_cos'] = \
+        df['a'] + df['b'] * (df['p_mw'] / 100) + \
+        df['c'] * (df['p_mw'] / 100) ** 2
 
     # Emissions
     df['F_emit'] = \
@@ -181,10 +198,10 @@ def compute_objective_terms(df, t):
         df['xi'] * np.exp(df['lambda'] * (df['p_mw'] / 100))
 
     # Withdrawal
-    df['F_with'] = df['beta_with'] * df['p_mw'] * t
+    df['F_with'] = df['beta_with'] * df['p_mw']
 
     # Consumption
-    df['F_con'] = df['beta_con'] * df['p_mw'] * t
+    df['F_con'] = df['beta_con'] * df['p_mw']
 
     return df
 
@@ -196,7 +213,8 @@ def mo_opf(ser_decisions, net):
     Parameters
     ----------
     ser_decisions: Series
-        Decision variables in series, index is bus number, values are power in MW
+        Decision variables in series, index is bus number, values are power in
+        MW
     net: pandapowerNet
         Network to assess, df_coef attribute
 
@@ -206,7 +224,6 @@ def mo_opf(ser_decisions, net):
         Series of objective values and internal decision
     """
     # Local vars
-    t = 5 * 1 / 60  # minutes * hr/minutes
     net = copy.deepcopy(net)
 
     # Apply decision to network
@@ -220,15 +237,21 @@ def mo_opf(ser_decisions, net):
 
     # Check if external generator is outside limits
     ext_grid_p_mw = net.res_ext_grid['p_mw'][0]
-    ext_gen_in_limits = net.ext_grid['min_p_mw'][0] < ext_grid_p_mw < net.ext_grid['max_p_mw'][0]
+    ext_gen_in_limits = \
+        net.ext_grid['min_p_mw'][0] < ext_grid_p_mw < \
+        net.ext_grid['max_p_mw'][0]
 
     if ext_gen_in_limits:
         # Formatting results
         df_obj = get_generator_information(net, ['res_gen', 'res_ext_grid'])
-        df_obj = df_obj.merge(net.df_coef, left_on=['element', 'et'], right_on=['element', 'et'])
+        df_obj = df_obj.merge(
+            net.df_coef,
+            left_on=['element', 'et'],
+            right_on=['element', 'et']
+        )
 
         # Compute objectives terms
-        df_obj = compute_objective_terms(df_obj, t)
+        df_obj = compute_objective_terms(df_obj)
 
         # Compute objectives
         df_obj_sum = df_obj.sum()
@@ -280,7 +303,7 @@ def get_fuel_cool(df_abido_coef):
 
     # Compute objectives terms
     df_abido_coef['p_mw'] = 50.0
-    df_objective_components = compute_objective_terms(df_abido_coef, t=np.nan)
+    df_objective_components = compute_objective_terms(df_abido_coef)
 
     # Minimum emissions gets assigned nuclear
     nuc_idx = df_objective_components['F_emit'].idxmin()
@@ -314,7 +337,8 @@ def get_emission_coef(df_coef):
     Returns
     -------
     df_coef: DataFrame
-        Updated coefficients dataframe with nuclear emission coefficients adjusted
+        Updated coefficients dataframe with nuclear emission coefficients
+        adjusted
     """
     # Local vars
     emit_cols = ['alpha', 'beta_emit', 'gamma', 'xi', 'lambda']
@@ -328,10 +352,12 @@ def get_emission_coef(df_coef):
 
 def get_water_use_rate(df_coef, df_macknick_coef):
     """
-    Assign water consumption and withdrawal rates based on macknick_operational_2012
+    Assign water consumption and withdrawal rates based on
+    macknick_operational_2012
 
     @article{macknick_operational_2012,
-        title = {Operational water consumption and withdrawal factors for electricity generating technologies: a review
+        title = {Operational water consumption and withdrawal factors for
+        electricity generating technologies: a review
          of existing literature},
         doi = {10.1088/1748-9326},
         journal = {Environ. Res. Lett.},
@@ -351,7 +377,8 @@ def get_water_use_rate(df_coef, df_macknick_coef):
     Returns
     -------
     df_coef: DataFrame
-        Coefficients dataframe with withdrawal and consumption rates assigned (gal/MWh)
+        Coefficients dataframe with withdrawal and consumption rates assigned
+        (gal/MWh)
     """
     df_coef = pd.merge(
         df_coef,
@@ -424,7 +451,9 @@ def get_epsilon_nondomintated(df, objs, epsilons, max_objs=None):
         max_ind = None
 
     # Nondominated sorting
-    non_dominated = pto.eps_sort([list(df.itertuples(False))], objs_ind, epsilons, maximize=max_ind)
+    non_dominated = pto.eps_sort(
+        [list(df.itertuples(False))], objs_ind, epsilons, maximize=max_ind
+    )
 
     # To DataFrame
     df_nondom = pd.DataFrame(non_dominated, columns=df.columns)
