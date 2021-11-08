@@ -106,9 +106,9 @@ def main():
         # Plot Objectives
         ticks = [np.arange(0, 10000, 50),
                  np.arange(0.0, 1.0, 0.02),
-                 np.arange(0, 1000000, 50000),
-                 np.arange(0, 10000, 200)]
-        limits = [[590, 1050], [0.17, 0.40], [-1, 410000], [3550, 4900]]
+                 np.arange(0, 5100000, 500000),
+                 np.arange(0, 59000, 2000)]
+        limits = [[590, 1050], [0.17, 0.40], [-1, 5100000], [37000, 59000]]
         viz.static_parallel(
             df=df_nondom,
             columns=obj_labs_pretty,
