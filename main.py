@@ -98,9 +98,9 @@ def main():
                 zip(dec_labs+obj_labs, dec_labs_pretty+obj_labs_pretty)),
             axis=1
         )
-        df_nondom['Color Index'] = df_nondom['Cost ($)']
+        df_nondom['Color Index'] = df_nondom['Cost ($/hr)']
         df_nondom = viz.set_color_gradient(
-            df_nondom, colormap='viridis', label='Cost ($)'
+            df_nondom, colormap='viridis', label='Cost ($/hr)'
         )
 
         # Plot Objectives
