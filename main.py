@@ -15,7 +15,7 @@ def main():
     # Inputs
     dec_labs = ['1', '4', '7', '10', '12', '0']
     obj_labs = ['F_cos', 'F_emit', 'F_with', 'F_con']
-    obj_epsi = [10.0, 0.01, 1000.00, 1000.00]
+    obj_epsi = [10.0, 0.01, 100000.00, 10000.00]
     dec_labs_pretty = ['Gen ' + i + ' (MW)' for i in dec_labs]
     obj_labs_pretty = [
         'Cost ($/hr)',
@@ -111,9 +111,9 @@ def main():
         # Plot Objectives
         ticks = [np.arange(0, 10000, 50),
                  np.arange(0.0, 1.0, 0.02),
-                 np.arange(0, 5100000, 500000),
-                 np.arange(0, 59000, 2000)]
-        limits = [[590, 1050], [0.17, 0.41], [-1, 5100000], [37000, 59000]]
+                 np.arange(0, 10000000, 1000000),
+                 np.arange(0, 300000, 20000)]
+        limits = [[590, 1050], [0.17, 0.41], [-1, 9100000], [59000, 240001]]
         viz.static_parallel(
             df=df_nondom,
             columns=obj_labs_pretty,
@@ -164,7 +164,7 @@ def main():
             df_nondom[obj_labs_pretty]
         ).savefig(inputs['path_to_objective_correlation_viz'])
 
-    if os.path.exists(inputs['path_to_nondom_hiplot_viz']):
+    if not os.path.exists(inputs['path_to_nondom_hiplot_viz']):
         # Load required checkpoints
         df_nondom = pd.read_csv(inputs['path_to_df_nondom'])
 
