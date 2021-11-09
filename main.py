@@ -39,6 +39,11 @@ def main():
         # Get water use coefficients
         df_coef = analysis.get_water_use_rate(df_coef, df_macknick_coef)
 
+        # Testing of coefficients (useful for debugging)
+        # df_coef['p_mw'] = 50.0
+        # df_objective_components = analysis.compute_objective_terms(df_coef)
+        # print(df_objective_components)
+
         # Assign coefficients
         net.df_coef = df_coef
 
@@ -158,6 +163,15 @@ def main():
         viz.correlation_heatmap(
             df_nondom[obj_labs_pretty]
         ).savefig(inputs['path_to_objective_correlation_viz'])
+
+    if os.path.exists(inputs['path_to_nondom_hiplot_viz']):
+        # Load required checkpoints
+        df_nondom = pd.read_csv(inputs['path_to_df_nondom'])
+
+        # Hiplot
+        analysis.hiplot_parallel(df_nondom, invert_cols=None).to_html(
+            inputs['path_to_nondom_hiplot_viz']
+        )
 
     return 0
 
