@@ -311,7 +311,7 @@ def get_fuel_cool(df_abido_coef):
     df_coef.loc[nuc_idx, 'cooling_type'] = 'Once-through'
 
     # Maximum emissions gets assigned coal
-    coal_idx = df_objective_components['F_emit'].nlargest(2).index
+    coal_idx = df_objective_components['F_emit'].nlargest(3).index
     df_coef.loc[coal_idx, 'fuel_type'] = 'Coal'
     df_coef.loc[coal_idx, 'cooling_type'] = 'Once-through'
 
@@ -319,7 +319,7 @@ def get_fuel_cool(df_abido_coef):
     df_coef['fuel_type'] = df_coef['fuel_type'].fillna('Natural Gas')
 
     # Natural gas get split to have some tower and some once-through cooling
-    df_coef['cooling_type'] = df_coef['cooling_type'].fillna('Tower', limit=2)
+    df_coef['cooling_type'] = df_coef['cooling_type'].fillna('Tower', limit=1)
     df_coef['cooling_type'] = df_coef['cooling_type'].fillna('Once-through')
 
     return df_coef
