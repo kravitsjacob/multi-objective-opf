@@ -310,8 +310,8 @@ def get_fuel_cool(df_abido_coef):
     df_coef.loc[nuc_idx, 'fuel_type'] = 'Nuclear'
     df_coef.loc[nuc_idx, 'cooling_type'] = 'Once-through'
 
-    # Minimum cost gets assigned coal
-    coal_idx = df_objective_components['F_cos'].idxmin()
+    # Maximum emissions gets assigned coal
+    coal_idx = df_objective_components['F_emit'].nlargest(2).index
     df_coef.loc[coal_idx, 'fuel_type'] = 'Coal'
     df_coef.loc[coal_idx, 'cooling_type'] = 'Once-through'
 
