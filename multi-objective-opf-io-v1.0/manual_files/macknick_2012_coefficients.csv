@@ -1,5 +1,5 @@
 fuel_type,cooling_type,withdrawal_rate_(gal/MWh),consumption_rate_(gal/MWh)
 Nuclear,Once-through,44350,269
-Natural Gas,Tower,225,205
+Natural Gas,Tower,225,826
 Natural Gas,Once-through,11380,100
 Coal,Once-through,36350,250
