@@ -11,6 +11,7 @@ import pandas as pd
 import pandapower as pp
 import pymoo.util.nds.efficient_non_dominated_sort as ends
 from pareto import pareto as pto
+import hiplot as hip
 
 
 def input_parse(path_to_config=None):
@@ -101,6 +102,10 @@ def input_parse(path_to_config=None):
             path_to_data,
             config_inputs['FIGURES']['path_to_objective_correlation_viz']
         ),
+        'path_to_nondom_hiplot_viz': os.path.join(
+            path_to_data,
+            config_inputs['FIGURES']['path_to_nondom_hiplot_viz']
+        )
     }
 
     return inputs
@@ -311,7 +316,7 @@ def get_fuel_cool(df_abido_coef):
     df_coef.loc[nuc_idx, 'cooling_type'] = 'Once-through'
 
     # Maximum emissions gets assigned coal
-    coal_idx = df_objective_components['F_emit'].nlargest(3).index
+    coal_idx = df_objective_components['F_emit'].nlargest(2).index
     df_coef.loc[coal_idx, 'fuel_type'] = 'Coal'
     df_coef.loc[coal_idx, 'cooling_type'] = 'Once-through'
 
@@ -319,7 +324,7 @@ def get_fuel_cool(df_abido_coef):
     df_coef['fuel_type'] = df_coef['fuel_type'].fillna('Natural Gas')
 
     # Natural gas get split to have some tower and some once-through cooling
-    df_coef['cooling_type'] = df_coef['cooling_type'].fillna('Tower', limit=1)
+    df_coef['cooling_type'] = df_coef['cooling_type'].fillna('Tower', limit=2)
     df_coef['cooling_type'] = df_coef['cooling_type'].fillna('Once-through')
 
     return df_coef
@@ -463,3 +468,27 @@ def get_epsilon_nondomintated(df, objs, epsilons, max_objs=None):
     df_nondom.index.name = None
 
     return df_nondom
+
+
+def hiplot_parallel(df, invert_cols=None):
+    """
+    Create parallel plot using Hiplot
+    Parameters
+    ----------
+    df: DataFrame
+        DataFrame to plot
+    invert_cols: list
+        Columns to flip
+    Returns
+    -------
+    exp: hiplot.experiment.Experiment
+        Hiplot parallel figure
+    """
+    exp = hip.Experiment.from_dataframe(df)
+    exp.display_data(
+        hip.Displays.PARALLEL_PLOT).update(
+        {'hide': ['uid'], 'invert': invert_cols}
+    )
+    exp.display_data(hip.Displays.TABLE).update({'hide': ['uid', 'from_uid']})
+    print(f'Success: Created parallel plot of columns {df.columns.to_list()}')
+    return exp
