@@ -8,4 +8,5 @@ dependencies:
   - dask-core
   - scikit-learn
   - seaborn
+  - hiplot
 prefix: C:\Users\kravi\.conda\envs\multi-objective-opf-env
