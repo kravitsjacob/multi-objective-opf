@@ -113,7 +113,7 @@ def main():
                  np.arange(0.0, 1.0, 0.02),
                  np.arange(0, 10000000, 1000000),
                  np.arange(0, 300000, 20000)]
-        limits = [[590, 1050], [0.17, 0.41], [-1, 9100000], [59000, 240001]]
+        limits = [[590, 1050], [0.17, 0.41], [-1, 9100000], [59000, 240010]]
         viz.static_parallel(
             df=df_nondom,
             columns=obj_labs_pretty,
