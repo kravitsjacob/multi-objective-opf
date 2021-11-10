@@ -4,39 +4,42 @@ Multi-objective optimal power flow with cost, emissions, thermoelectric water wi
 # I. Contents
 ```
 multi-objective-opf
+│   .gitattributes
 │   .gitignore
+│   config.ini: Configuration file with inputs and outputs
+│   environment.yml: Conda environment
 │   LICENSE
 │   main.py: Python script to conduct analysis
-│   environment.yml: Conda environment
 │   README.md
-│   run.sh: Bash script to run main.py
-│   config.ini: Configuration file with inputs and outputs
+│   run.sh: Bash script to run main.py with proper dependencies
 │   slurm_run.sh: `run.sh` equivalent with the slurm batch manager
 │   slurm_test_run.sh: Minimal run to test is run will work on slurm
+|
+├───.github: Github actions for running unit testing
+│   └───workflows
+│           python-package-conda.yml
 │
-├───src: Source code
-│       analysis.py: Source code for analysis
-│       viz.py: Source code for visualization
-│       analysis_testing.py: Unit tests for functions in `analysis.py`
-│    
 │
 ├───multi-objective-opf-io-v1.0
-│   ├───manual_files
-│   │       abido_2003_coefficients.csv: Emissions coefficients 
-│   │       macknick_2012_coefficients.csv: Water usage coefficients
+│   ├───figures
+│   │       nondom_decisions.pdf
+│   │       nondom_hiplot.html: Interactive figure
+│   │       nondom_objectives.pdf
+│   │       objective_correlation.pdf
 │   │
 │   ├───generated_files
 │   │       grid_results.csv: Results of grid search
-│   │       nondom.csv: Epsilon nondominated set of grid_results
+│   │       nondom.csv: Epsilon non-dominated set of grid_results
 │   │
-│   └───figures
-│           objective_correlation.pdf
-│           nondom_objectives.pdf
-│           nondom_decisions.pdf
+│   └───manual_files
+│           abido_2003_coefficients.csv: Emissions coefficients 
+│           macknick_2012_coefficients.csv: Water usage coefficients
 │
-└───.github
-    └───workflows
-            python-package-conda.yml: Github actions for running `analysis_testing.py`
+│
+└───src: Source code
+        analysis.py: Source code for analysis
+        viz.py: Source code for visualization
+        analysis_testing.py: Unit tests for functions in `analysis.py`
 ```
 
 # II. How to Run
