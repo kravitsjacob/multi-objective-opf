@@ -14,7 +14,7 @@
 #SBATCH --mail-type=END
 
 # Setup
-module purge s
+module purge
 source /curc/sw/anaconda3/2019.07/bin/activate
 
 # Create conda environment
