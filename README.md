@@ -1,5 +1,5 @@
 # multi-objective-opf
-Our paper look at multi-objective OPF formulation with cost, emissions, water withdrawal, and water conusmption. 
+Multi-objective optimal power flow with cost, emissions, thermoelectric water withdrawal, and thermoelectric water consumption.
 
 # I. Contents
 ```
